@@ -16,7 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+package org.apache.pulsar.ecosystem.io.openmldb;
+
+import org.apache.pulsar.io.core.annotations.Connector;
+import org.apache.pulsar.io.core.annotations.IOType;
+import org.apache.pulsar.io.jdbc.BaseJdbcAutoSchemaSink;
+import org.apache.pulsar.io.jdbc.JdbcSinkConfig;
+
 /**
- * Classes for implementing a pulsar IO connector that generates randomized messages.
+ *
  */
-package org.apache.pulsar.ecosystem.io.random;
+@Connector(
+        name = "jdbc-postgres",
+        type = IOType.SINK,
+        help = "A simple JDBC sink for PostgreSQL that writes pulsar messages to a database table",
+        configClass = JdbcSinkConfig.class
+)
+public class OpenMLDBJdbcAutoSchemaSink extends BaseJdbcAutoSchemaSink {
+
+}

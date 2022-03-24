@@ -31,8 +31,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.pulsar.ecosystem</groupId>
-  <artifactId>pulsar-io-template</artifactId>
-  <version>0.0.1</version>
+  <artifactId>pulsar-io-jdbc-openmldb</artifactId>
+  <version>2.9.1</version>
   <name>Pulsar Ecosystem :: IO Connector :: Template Project</name>
   <description>It is a project template for developing an Apache Pulsar connector</description>
 
@@ -47,7 +47,7 @@
     <!-- connector dependencies -->
     <jackson.version>2.9.7</jackson.version>
     <lombok.version>1.16.22</lombok.version>
-    <pulsar.version>2.2.0</pulsar.version>
+    <pulsar.version>2.9.1</pulsar.version>
 
     <!-- test dependencies -->
     <junit.version>4.12</junit.version>
@@ -78,8 +78,13 @@
     <dependencies>
       <dependency>
         <groupId>org.apache.pulsar</groupId>
-        <artifactId>pulsar-io-core</artifactId>
+        <artifactId>pulsar-io-jdbc-core</artifactId>
         <version>${pulsar.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.4paradigm.openmldb</groupId>
+        <artifactId>openmldb-jdbc</artifactId>
+        <version>0.5.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
@@ -143,7 +148,11 @@
     <!-- runtime dependencies -->
     <dependency>
       <groupId>org.apache.pulsar</groupId>
-      <artifactId>pulsar-io-core</artifactId>
+      <artifactId>pulsar-io-jdbc-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.4paradigm.openmldb</groupId>
+      <artifactId>openmldb-jdbc</artifactId>
     </dependency>
 
     <dependency>

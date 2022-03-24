@@ -16,24 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.pulsar.ecosystem.io.random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+package org.apache.pulsar.ecosystem.io.openmldb;
+
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.pulsar.io.core.SourceContext;
+
+import org.apache.pulsar.io.core.SinkContext;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Unit test {@link RandomConnector}.
+ * Unit test {@link OpenMLDBJdbcAutoSchemaSink}.
  */
-public class RandomConnectorTest {
+public class OpenMLDBJdbcAutoSchemaSinkTest {
 
     private final Map<String, Object> goodConfig = new HashMap<>();
     private final Map<String, Object> badConfig = new HashMap<>();
@@ -51,13 +50,10 @@ public class RandomConnectorTest {
      */
     @Test
     public void testOpenConnectorWithGoodConfig() throws Exception {
-        RandomConnector connector = new RandomConnector();
-        connector.open(goodConfig, mock(SourceContext.class));
+        OpenMLDBJdbcAutoSchemaSink connector = new OpenMLDBJdbcAutoSchemaSink();
+        connector.open(goodConfig, mock(SinkContext.class));
 
-        assertNotNull("RandomConnectorConfig should be initialized", connector.getConfig());
-        assertNotNull("Random instance should be initialized", connector.getRandom());
-
-        assertEquals(RandomConnectorConfig.load(goodConfig), connector.getConfig());
+        // goodConfig won't throw exception
     }
 
     /**
@@ -67,16 +63,14 @@ public class RandomConnectorTest {
      */
     @Test
     public void testOpenConnectorWithBadConfig() throws Exception {
-        RandomConnector connector = new RandomConnector();
+        OpenMLDBJdbcAutoSchemaSink connector = new OpenMLDBJdbcAutoSchemaSink();
         try {
-            connector.open(badConfig, mock(SourceContext.class));
+            connector.open(badConfig, mock(SinkContext.class));
             fail("Should failed to open the connector when using an invalid configuration");
         } catch (NullPointerException npe) {
             // expected
         }
 
-        assertNotNull("RandomConnectorConfig should be initialized", connector.getConfig());
-        assertNull("Random instance should not be initialized", connector.getRandom());
     }
 
     /**
@@ -86,32 +80,30 @@ public class RandomConnectorTest {
      */
     @Test
     public void testOpenConnectorTwice() throws Exception {
-        RandomConnector connector = new RandomConnector();
-        connector.open(goodConfig, mock(SourceContext.class));
-        assertEquals(RandomConnectorConfig.load(goodConfig), connector.getConfig());
+        OpenMLDBJdbcAutoSchemaSink connector = new OpenMLDBJdbcAutoSchemaSink();
+        connector.open(goodConfig, mock(SinkContext.class));
 
         Map<String, Object> anotherConfig = new HashMap<>(goodConfig);
         // change the maxMessageSize
         anotherConfig.put("maxMessageSize", 2048);
         try {
-            connector.open(anotherConfig, mock(SourceContext.class));
+            connector.open(anotherConfig, mock(SinkContext.class));
             fail("Should fail to open a connector multiple times");
         } catch (IllegalStateException ise) {
             // expected
         }
-        assertEquals(RandomConnectorConfig.load(goodConfig), connector.getConfig());
     }
 
     /**
-     * Test opening the connector twice.
+     * Test writing before opening.
      *
      * @throws Exception when fail to open the connector
      */
     @Test
-    public void testReadRecordsBeforeOpeningConnector() throws Exception {
-        RandomConnector connector = new RandomConnector();
+    public void testWriteRecordsBeforeOpeningConnector() throws Exception {
+        OpenMLDBJdbcAutoSchemaSink connector = new OpenMLDBJdbcAutoSchemaSink();
         try {
-            connector.read();
+//            connector.write();
             fail("Should fail to read records if a connector is not open");
         } catch (IllegalStateException ise) {
             // expected
