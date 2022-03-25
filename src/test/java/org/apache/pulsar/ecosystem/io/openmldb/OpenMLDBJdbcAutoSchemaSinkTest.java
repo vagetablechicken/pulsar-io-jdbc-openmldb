@@ -19,9 +19,14 @@
 
 package org.apache.pulsar.ecosystem.io.openmldb;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,8 +44,32 @@ public class OpenMLDBJdbcAutoSchemaSinkTest {
 
     @Before
     public void setup() {
-        goodConfig.put("randomSeed", System.currentTimeMillis());
-        goodConfig.put("maxMessageSize", 1024);
+        // use client to create db & table
+        String zk = "localhost:6181", zkPath = "/onebox";
+        String jdbcUrl = String.format("jdbc:openmldb:///?zk=%s&zkPath=%s", zk, zkPath);
+
+        String dbName = "pulsar_test";
+        String tableName = "connector_test";
+        Connection connection = null;
+        try {
+            Class.forName("com._4paradigm.openmldb.jdbc.SQLDriver");
+            connection = DriverManager.getConnection(jdbcUrl);
+            Statement stmt = connection.createStatement();
+            stmt.execute("create database if not exists " + dbName);
+            stmt.execute(String.format("use %s", dbName));
+            stmt.execute(String.format("create table if not exists %s(c1 int, c2 string)", tableName));
+        } catch (SQLException | ClassNotFoundException e) {
+            // TODO: 'create table if not exists' is not supported now
+            e.printStackTrace();
+        }
+        assertNotNull(connection);
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        goodConfig.put("jdbcUrl", jdbcUrl);
+        goodConfig.put("tableName", "test");
     }
 
     /**
@@ -103,10 +132,11 @@ public class OpenMLDBJdbcAutoSchemaSinkTest {
     public void testWriteRecordsBeforeOpeningConnector() throws Exception {
         OpenMLDBJdbcAutoSchemaSink connector = new OpenMLDBJdbcAutoSchemaSink();
         try {
-//            connector.write();
-            fail("Should fail to read records if a connector is not open");
-        } catch (IllegalStateException ise) {
+            connector.write(() -> null);
+            fail("Should fail to write records if a connector is not open");
+        } catch (NullPointerException npe) {
             // expected
+            // incomingList in sink is null
         }
     }
 
